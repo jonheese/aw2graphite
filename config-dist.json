@@ -1,0 +1,10 @@
+{
+    "AW_API_KEY": "yourAWapiKey",
+    "AW_APPLICATION_KEY": "yourAWapplicationKey",
+    "CARBON_SERVER": "your.carbon.server",
+    "CARBON_PORT": 2003
+    "SMTP_SERVER": "your.email.server",
+    "SMTP_PORT": 25,
+    "ALERT_FROM": "from.address@example.com",
+    "ALERT_TO": "to.address@example.com"
+}
