@@ -33,6 +33,7 @@ class Aw2Graphite:
             self.smtp_port = config.get('SMTP_PORT')
             self.alert_from = config.get('ALERT_FROM')
             self.alert_to = config.get('ALERT_TO')
+            self.alert_state_file = config.get('ALERT_STATE_FILE')
 
         if 'AW_API_KEY' not in config.keys() or 'AW_APPLICATION_KEY' not in config.keys():
             raise RuntimeError(
@@ -81,6 +82,7 @@ class Aw2Graphite:
         try:
             sock = socket.socket()
             sock.connect((self.carbon_server, self.carbon_port))
+            found_alert = False
             for metric_name in message.keys():
                 try:
                     alert = False
@@ -97,15 +99,33 @@ class Aw2Graphite:
                         #self._log.info(s)
                         sock.send(s.encode())
                     if alert:
-                        self._log.info(f"Sending alert email to {self.alert_to} with content: {alert}")
-                        with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
-                            server.sendmail(
-                                self.alert_from,
-                                self.alert_to,
-                                f'Subject: {alert}\n\n{alert}'
-                            )
+                        found_alert = True
+                        already_alerted = False
+                        try:
+                            with open(self.alert_state_file) as f:
+                                if alert == f.readline():
+                                    already_alerted = True
+                        except Exception as e:
+                            pass
+                        if already_alerted:
+                            self._log.info(f"Already alerted for alert {alert} so not sending email")
+                        else:
+                            self._log.info(f"Sending alert email to {self.alert_to} with content: {alert}")
+                            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+                                server.sendmail(
+                                    self.alert_from,
+                                    self.alert_to,
+                                    f'Subject: {alert}\n\n{alert}'
+                                )
+                            with open(self.alert_state_file, 'w') as f:
+                                self._log.info(f"Writing alert to {self.alert_state_file}: ({alert})")
+                                f.write(alert)
                 except Exception as e:
                     self._log.exception(e)
+            if not found_alert:
+                with open(self.alert_state_file, 'w') as f:
+                    self._log.info(f"Blanking {self.alert_state_file}")
+                    f.write('')
         except Exception as e:
             self._log.exception(e)
         finally:
@@ -114,6 +134,3 @@ class Aw2Graphite:
 
 if __name__ == '__main__':
     aw2graphite = Aw2Graphite()
-    #aw2graphite.get_devices()
-    #aw2graphite.insert_data()
-    

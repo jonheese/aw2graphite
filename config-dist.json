@@ -6,5 +6,6 @@
     "SMTP_SERVER": "your.email.server",
     "SMTP_PORT": 25,
     "ALERT_FROM": "from.address@example.com",
-    "ALERT_TO": "to.address@example.com"
+    "ALERT_TO": "to.address@example.com",
+    "ALERT_STATE_FILE": "/tmp/aw2graphite.alert"
 }
