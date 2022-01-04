@@ -93,27 +93,19 @@ class Aw2Graphite:
             f.write(json.dumps(self.alerts, indent=2))
 
     def update_alert(self, is_alerting, metric_name, alert_msg=None):
-        was_alerting = self.alerts.get(metric_name)
-        if was_alerting:
-            if not is_alerting:
-                self.send_alert_email(
-                    subject=f"RECOVERY: {metric_name}",
-                    message=alert_msg,
+        # Check if alerting status has changed
+        if self.alerts.get(metric_name) != is_alerting:
+            if is_alerting:
+                subject_prefix = "PROBLEM: "
+            else:
+                subject_prefix = "RECOVERY: "
+            with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
+                server.sendmail(
+                    self.alert_from,
+                    self.alert_to,
+                    f'Subject: {subject_prefix}: {metric_name}\n\n{alert_msg}',
                 )
-        elif is_alerting:
-            self.send_alert_email(
-                subject=f"PROBLEM: {metric_name}",
-                message=alert_msg,
-            )
         self.alerts[metric_name] = is_alerting
-
-    def send_alert_email(self, subject, message):
-        with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
-            server.sendmail(
-                self.alert_from,
-                self.alert_to,
-                f'Subject: {subject}\n\n{message}',
-            )
 
     def check_if_alerting(self, metric_name, value):
         threshold = None
