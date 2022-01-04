@@ -1,4 +1,5 @@
 {
+    "LOGLEVEL": 10,
     "AW_API_KEY": "yourAWapiKey",
     "AW_APPLICATION_KEY": "yourAWapplicationKey",
     "CARBON_SERVER": "your.carbon.server",
@@ -7,5 +8,19 @@
     "SMTP_PORT": 25,
     "ALERT_FROM": "from.address@example.com",
     "ALERT_TO": "to.address@example.com",
-    "ALERT_STATE_FILE": "/tmp/aw2graphite.alert"
+    "ALERT_STATE_FILE": "/tmp/aw2graphite.alert",
+    "ALERT_THRESHOLDS": {
+        "metric1": {
+            "operator": "lt",
+            "threshold": 1
+        },
+        "metric2": {
+            "operator": "ge",
+            "threshold": 30
+        },
+        "metric3": {
+            "operator": "eq",
+            "threshold": 288.3
+        }
+    }
 }
