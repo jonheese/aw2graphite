@@ -46,9 +46,10 @@ class Aw2Graphite:
         self.alerts = {}
         self.load_alerts()
         self.__websocket = Websocket(self.app_key, self.api_key)
+        self.__is_connected = False
 
         self.__websocket.on_connect(self.connect)
-        self.__websocket.on_data(self.data)
+        self.__websocket.on_data(self.handle_data)
         self.__websocket.on_disconnect(self.disconnect)
         self.__websocket.on_subscribed(self.subscribed)
         loop = asyncio.get_event_loop()
@@ -56,19 +57,26 @@ class Aw2Graphite:
         loop.run_forever()
 
     async def __main_loop(self):
-        try:
-            await self.__websocket.connect()
-        except WebsocketError as err:
-            self._log.error(f"There was a websocket error: {err}")
+        if not self.__is_connected:
+            try:
+                await self.__websocket.connect()
+            except WebsocketError as err:
+                self._log.error(f"There was a websocket error: {err}")
+                self.__is_connected = False
+                loop.create_task(self.__main_loop())
 
     def disconnect(self):
+        self.__is_connected = False
         self._log.info("Disconnected from server")
+        loop = asyncio.get_event_loop()
+        loop.create_task(self.__main_loop())
 
     def connect(self):
         self._log.info("Connection established")
+        self.__is_connected = True
 
-    def subscribed(self, data):
-        devices = data.get('devices')
+    def subscribed(self, message):
+        devices = message.get('devices')
         for device in devices:
             mac = device.get('macAddress')
             if mac not in self._devices:
@@ -131,7 +139,7 @@ class Aw2Graphite:
             alert_msg=f"Weather metric {metric_name} is at value {value}, configured threshold is {threshold}",
         )
 
-    def data(self, message):
+    def handle_data(self, message):
         mac = message.get('macAddress')
         if mac not in self._devices:
             self._log(f"Not handling update for device {mac} since it's not in my device list")
