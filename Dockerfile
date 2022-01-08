@@ -1,9 +1,10 @@
 FROM python:3.8.1-alpine
 WORKDIR /usr/src/app
-COPY requirements.txt /usr/src/app/requirements.txt
 RUN set -eux \
     && pip install --upgrade pip setuptools wheel \
-    && rm -rf /root/.cache/pip \
+    && rm -rf /root/.cache/pip
+COPY requirements.txt /usr/src/app/requirements.txt
+RUN set -eux \
     && pip install -r /usr/src/app/requirements.txt \
     && rm -rf /root/.cache/pip
 COPY aw2graphite-rt.py /usr/src/app/aw2graphite-rt.py
