@@ -162,11 +162,15 @@ class Aw2Graphite:
 
     def __update_alert(self, is_alerting, metric_name, alert_msg=None):
         # Check if alerting status has changed
-        if self._state.get(metric_name) and \
+        if self._state.get(metric_name) is not None and \
                 self._state.get(metric_name) != is_alerting:
+            self._log.debug(f"Metric {metric_name} alert state was " +
+                f"{self._state.get(metric_name)} and is now {is_alerting}")
             if is_alerting:
+                self._log.debug("That makes this a problem")
                 subject_prefix = "[PROBLEM]"
             else:
+                self._log.debug("That makes this a recovery")
                 subject_prefix = "[RECOVERY]"
             with smtplib.SMTP(
                 self.__config.get("SMTP_SERVER"),
