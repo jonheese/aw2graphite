@@ -118,8 +118,7 @@ class Aw2Graphite:
     def _disconnect(self):
         self.__is_connected = False
         self._log.info("Disconnected from server")
-        loop = asyncio.get_event_loop()
-        loop.create_task(self.__main_loop())
+        asyncio.get_event_loop().create_task(self.__main_loop())
 
     def _connect(self):
         self._log.info("Connection established")
@@ -134,7 +133,7 @@ class Aw2Graphite:
                 self._log.info(f"Added {mac} to my device list")
             else:
                 self._log.info(
-                    "Not adding {mac} to my device list because " +
+                    f"Not adding {mac} to my device list because " +
                     "it's already there"
                 )
 
