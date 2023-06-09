@@ -1,4 +1,4 @@
-FROM python:3.8.1-alpine
+FROM python:3.11.4-alpine
 WORKDIR /usr/src/app
 RUN set -eux \
     && pip install --upgrade pip setuptools wheel \
@@ -7,7 +7,7 @@ COPY requirements.txt /usr/src/app/requirements.txt
 RUN set -eux \
     && pip install -r /usr/src/app/requirements.txt \
     && rm -rf /root/.cache/pip
-COPY aw2graphite-rt.py /usr/src/app/aw2graphite-rt.py
+COPY aw2graphite-cs.py /usr/src/app/aw2graphite-cs.py
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-CMD ["python3", "aw2graphite-rt.py"]
+CMD ["flask", "--app", "aw2graphite-cs", "run", "--host", "0.0.0.0"]

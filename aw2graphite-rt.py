@@ -7,6 +7,7 @@ import smtplib
 import socket
 import sys
 import time
+import traceback
 
 from aioambient import Websocket
 from aioambient.errors import WebsocketError
@@ -111,14 +112,12 @@ class Aw2Graphite:
             try:
                 await self.__websocket.connect()
             except WebsocketError as err:
+                traceback.print_exc()
                 self._log.error(f"There was a websocket error: {err}")
-                self.__is_connected = False
-                asyncio.get_event_loop().create_task(self.__main_loop())
 
     def _disconnect(self):
         self.__is_connected = False
         self._log.info("Disconnected from server")
-        asyncio.get_event_loop().create_task(self.__main_loop())
 
     def _connect(self):
         self._log.info("Connection established")
@@ -250,4 +249,6 @@ class Aw2Graphite:
 
 
 if __name__ == '__main__':
-    aw2graphite = Aw2Graphite()
+    while True:
+        aw2graphite = Aw2Graphite()
+        time.sleep(1)

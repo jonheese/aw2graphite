@@ -1,10 +1,10 @@
 version: '3.7'
 
 services:
-  aw2graphite-rt:
-    container_name: aw2graphite-rt
+  aw2graphite-cs:
+    container_name: aw2graphite-cs
     build: .
-    image: jonheese/aw2graphite-rt:latest
+    image: jonheese/aw2graphite-cs:latest
     volumes:
       - type: bind
         source: ./config.json
@@ -13,4 +13,6 @@ services:
         source: ./aw2graphite.alert
         target: /usr/src/app/aw2graphite.alert
     network_mode: "bridge"
+    ports:
+      - "5000:5000"
     restart: always
