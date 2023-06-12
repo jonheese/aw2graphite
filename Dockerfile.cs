@@ -3,7 +3,7 @@ WORKDIR /usr/src/app
 RUN set -eux \
     && pip install --upgrade pip setuptools wheel \
     && rm -rf /root/.cache/pip
-COPY requirements.txt /usr/src/app/requirements.txt
+COPY requirements.cs.txt /usr/src/app/requirements.txt
 RUN set -eux \
     && pip install -r /usr/src/app/requirements.txt \
     && rm -rf /root/.cache/pip

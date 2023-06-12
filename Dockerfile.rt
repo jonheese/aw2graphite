@@ -1,0 +1,13 @@
+FROM python:3.11.4-alpine
+WORKDIR /usr/src/app
+RUN set -eux \
+    && pip install --upgrade pip setuptools wheel \
+    && rm -rf /root/.cache/pip
+COPY requirements.rt.txt /usr/src/app/requirements.txt
+RUN set -eux \
+    && pip install -r /usr/src/app/requirements.txt \
+    && rm -rf /root/.cache/pip
+COPY aw2graphite-rt.py /usr/src/app/aw2graphite-rt.py
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+CMD ["python3", "aw2graphite-rt.py"]

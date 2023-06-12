@@ -3,7 +3,9 @@ version: '3.7'
 services:
   aw2graphite-cs:
     container_name: aw2graphite-cs
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile.cs
     image: jonheese/aw2graphite-cs:latest
     volumes:
       - type: bind
@@ -15,4 +17,19 @@ services:
     network_mode: "bridge"
     ports:
       - "5000:5000"
+    restart: always
+  aw2graphite-rt:
+    container_name: aw2graphite-rt
+    build:
+      context: .
+      dockerfile: Dockerfile.rt
+    image: jonheese/aw2graphite-rt:latest
+    volumes:
+      - type: bind
+        source: ./config.json
+        target: /usr/src/app/config.json
+      - type: bind
+        source: ./aw2graphite.alert
+        target: /usr/src/app/aw2graphite.alert
+    network_mode: "bridge"
     restart: always

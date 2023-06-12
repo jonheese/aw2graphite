@@ -229,6 +229,9 @@ class Aw2Graphite:
             )
             found_alert = False
             for metric_name in message.keys():
+                rt_metrics = self.__config.get('RT_METRICS')
+                if rt_metrics and metric_name not in rt_metrics:
+                    continue
                 try:
                     alert = False
                     value = message.get(metric_name)
